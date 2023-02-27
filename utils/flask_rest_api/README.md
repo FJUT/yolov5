@@ -9,7 +9,7 @@ created using Flask to expose the YOLOv5s model from [PyTorch Hub](https://pytor
 [Flask](https://palletsprojects.com/p/flask/) is required. Install with:
 
 ```shell
-$ pip install Flask
+pip3 install  opencv-python Flask torch torchvision "gitpython" "setuptools>=65.5.1" "wheel>=0.38.0" -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## Run

@@ -9,31 +9,58 @@ import io
 import torch
 from flask import Flask, request
 from PIL import Image
+# from models.common import DetectMultiBackend
+import datetime
 
 app = Flask(__name__)
 models = {}
 
 DETECTION_URL = "/v1/object-detection/<model>"
 
+@app.route('/')
+def index():
+    return 'heyo'
 
 @app.route(DETECTION_URL, methods=["POST"])
 def predict(model):
     if request.method != "POST":
         return
 
-    if request.files.get("image"):
+    if request.files.get("image") or request.form.get("path"):
         # Method 1
         # with request.files["image"] as f:
         #     im = Image.open(io.BytesIO(f.read()))
 
         # Method 2
-        im_file = request.files["image"]
-        im_bytes = im_file.read()
-        im = Image.open(io.BytesIO(im_bytes))
+        if request.files.get("image"):
+            imgFrom = 'remote'
+            im_file = request.files["image"]
+            im_bytes = io.BytesIO(im_file.read())
+        else:
+            imgFrom = 'local'
+            im_bytes = '/www/node/zaniliazhao/' + request.form.get("path") # upload/ScreenShot/名称_1677343150621.jpg
+            
+        im = Image.open(im_bytes)
 
-        if model in models:
-            results = models[model](im, size=640)  # reduce size=320 for faster inference
-            return results.pandas().xyxy[0].to_json(orient="records")
+        # if model in models:
+        #     results = models[model](im, size=640)  # reduce size=320 for faster inference
+        #     return results.pandas().xyxy[0].to_json(orient="records")
+        # model = torch.hub.load(r'C:\Users\Milan\Projects\yolov5', 'custom', path=r'C:\Users\Milan\Projects\yolov5\models\yolov5s.pt', source='local')
+
+        modelY = torch.hub.load('/www/python/yolov5/yolov5-master/', 'custom', path='/www/python/yolov5/weights/best.pt', source='local', force_reload=True)
+        # modelY = torch.hub.load('/Users/guotao071/dev/github/qt/yolov5/', 'custom', path='/Users/guotao071/dev/github/qt/yolov5/runs/train/exp14/weights/best.pt', source='local', force_reload=False)
+
+        modelY.conf = 0.25  # NMS confidence threshold
+        results = modelY(im, size=640)  # reduce size=320 for faster inference
+        # results = torch.hub.load('/Users/guotao071/dev/github/qt/yolov5/', 'custom', path='/Users/guotao071/dev/github/qt/yolov5/weights/yolov5n6.pt', source='local')(im, size=640) 
+        # results = DetectMultiBackend('/Users/guotao071/dev/github/qt/yolov5/weights/yolov5n6.pt')(im, size=640)
+        if imgFrom == 'remote': # 上传的图片才保存，通过 path 读取的无需重复保存
+            nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+            im.save('/www/node/zaniliazhao/upload/ScreenShot/' + nowTime + '.' + im.format)
+        return results.pandas().xyxy[0].to_json(orient="records")
+        
+    else:
+        return 'no image attached'
 
 
 if __name__ == "__main__":
@@ -42,7 +69,8 @@ if __name__ == "__main__":
     parser.add_argument('--model', nargs='+', default=['yolov5s'], help='model(s) to run, i.e. --model yolov5n yolov5s')
     opt = parser.parse_args()
 
-    for m in opt.model:
-        models[m] = torch.hub.load("ultralytics/yolov5", m, force_reload=True, skip_validation=True)
+    # for m in opt.model:
+    #     # models[m] = torch.hub.load("ultralytics/yolov5", m, force_reload=True, skip_validation=True)
+    #     models[m] = torch.hub.load("/Users/guotao071/dev/github/qt/yolov5/", m, force_reload=True, skip_validation=True, source='local')
 
     app.run(host="0.0.0.0", port=opt.port)  # debug=True causes Restarting with stat
