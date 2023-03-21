@@ -7,7 +7,7 @@ import argparse
 import io
 
 import torch
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from PIL import Image
 # from models.common import DetectMultiBackend
 import datetime
@@ -47,8 +47,8 @@ def predict(model):
         #     return results.pandas().xyxy[0].to_json(orient="records")
         # model = torch.hub.load(r'C:\Users\Milan\Projects\yolov5', 'custom', path=r'C:\Users\Milan\Projects\yolov5\models\yolov5s.pt', source='local')
 
-        modelY = torch.hub.load('/www/python/yolov5/yolov5-master/', 'custom', path='/www/python/yolov5/weights/best.pt', source='local', force_reload=True)
-        # modelY = torch.hub.load('/Users/guotao071/dev/github/qt/yolov5/', 'custom', path='/Users/guotao071/dev/github/qt/yolov5/runs/train/exp14/weights/best.pt', source='local', force_reload=False)
+        # modelY = torch.hub.load('/www/python/yolov5/yolov5-master/', 'custom', path='/www/python/yolov5/weights/best.pt', source='local', force_reload=False)
+        modelY = torch.hub.load('/Users/guotao071/dev/github/qt/yolov5/', 'custom', path='weights/best.pt', source='local', force_reload=False)
 
         modelY.conf = 0.25  # NMS confidence threshold
         results = modelY(im, size=640)  # reduce size=320 for faster inference
@@ -56,8 +56,13 @@ def predict(model):
         # results = DetectMultiBackend('/Users/guotao071/dev/github/qt/yolov5/weights/yolov5n6.pt')(im, size=640)
         if imgFrom == 'remote': # 上传的图片才保存，通过 path 读取的无需重复保存
             nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-            im.save('/www/node/zaniliazhao/upload/ScreenShot/' + nowTime + '.' + im.format)
-        return results.pandas().xyxy[0].to_json(orient="records")
+            # im.save('/www/node/zaniliazhao/upload/ScreenShot/' + nowTime + '.' + im.format)
+            # im.save('./' + nowTime + '.' + im.format)
+        return jsonify(
+            code = 0,
+            result = results.pandas().xyxy[0].to_json(orient="records"),
+            # filePath = ""
+        )
         
     else:
         return 'no image attached'
