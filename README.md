@@ -1,3 +1,7 @@
+导出模型
+python3 export.py --weights runs/train/exp16/weights/last.pt --include torchscript --img 640 --optimize
+
+
 <div align="center">
   <p>
     <a align="center" href="https://ultralytics.com/yolov5" target="_blank">
