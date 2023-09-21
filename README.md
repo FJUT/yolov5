@@ -1,6 +1,7 @@
 导出模型
-python3 export.py --weights runs/train/exp16/weights/last.pt --include torchscript --img 640 --optimize
+python3 export.py --weights runs/train/exp22/weights/last.pt --include torchscript --img 640 --optimize
 
+python3 train.py --image-weights
 
 <div align="center">
   <p>
