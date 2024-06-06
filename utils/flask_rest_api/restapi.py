@@ -26,15 +26,15 @@ def predict(model):
     if request.method != "POST":
         return
 
-    if request.files.get("image") or request.form.get("path"):
+    if request.files.get("file") or request.form.get("path"):
         # Method 1
         # with request.files["image"] as f:
         #     im = Image.open(io.BytesIO(f.read()))
 
         # Method 2
-        if request.files.get("image"):
+        if request.files.get("file"):
             imgFrom = 'remote'
-            im_file = request.files["image"]
+            im_file = request.files["file"]
             im_bytes = io.BytesIO(im_file.read())
         else:
             imgFrom = 'local'
@@ -48,21 +48,33 @@ def predict(model):
         # model = torch.hub.load(r'C:\Users\Milan\Projects\yolov5', 'custom', path=r'C:\Users\Milan\Projects\yolov5\models\yolov5s.pt', source='local')
 
         # modelY = torch.hub.load('/www/python/yolov5/yolov5-master/', 'custom', path='/www/python/yolov5/weights/best.pt', source='local', force_reload=False)
-        modelY = torch.hub.load('/Users/guotao071/dev/github/qt/yolov5/', 'custom', path='weights/best.pt', source='local', force_reload=False)
+        modelY = torch.hub.load('/Users/guotao071/dev/github/qt/yolov5/', 'custom', path='runs/train/exp28-imgsz-1280/weights/best.pt', source='local', force_reload=False)
+        # modelY = torch.hub.load('/Users/guotao071/dev/github/qt/yolov5/', 'custom', path='weights/best.pt', source='local', force_reload=False)
 
-        modelY.conf = 0.25  # NMS confidence threshold
+        modelY.conf = 0.5  # NMS confidence threshold 最低置信度
         results = modelY(im, size=640)  # reduce size=320 for faster inference
         # results = torch.hub.load('/Users/guotao071/dev/github/qt/yolov5/', 'custom', path='/Users/guotao071/dev/github/qt/yolov5/weights/yolov5n6.pt', source='local')(im, size=640) 
         # results = DetectMultiBackend('/Users/guotao071/dev/github/qt/yolov5/weights/yolov5n6.pt')(im, size=640)
         if imgFrom == 'remote': # 上传的图片才保存，通过 path 读取的无需重复保存
             nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-            # im.save('/www/node/zaniliazhao/upload/ScreenShot/' + nowTime + '.' + im.format)
+            # im.save('/Users/guotao071/Pictures/screen_shot/' + nowTime + '.' + im.format)
             # im.save('./' + nowTime + '.' + im.format)
-        return jsonify(
-            code = 0,
-            result = results.pandas().xyxy[0].to_json(orient="records"),
+        result = results.pandas().xyxy[0].to_json(orient="records")
+        res = jsonify(
+            responseCode = "000000",
+            result = result,
             # filePath = ""
         )
+        im.save('/Users/guotao071/Pictures/screen_shot/' + request.form.get("pageKey") + '||' + request.form.get("pageName") + '.' + im.format)
+        #将json写入同名文件中
+        if result.find('{') != -1:
+            with open('/Users/guotao071/Pictures/screen_shot/' + request.form.get("pageKey") + '||' + request.form.get("pageName") + '.txt','w') as f:
+                f.write(result)                 
+        # 处理文件名过长的问题
+        # if result.find('},{') != -1 and len(result) > 234:
+        #     result = result.split('},{', 1)[0] + '},{}]'
+        # im.save('/Users/guotao071/Pictures/screen_shot/' + request.form.get("pageKey") + '||' + request.form.get("pageName") + '||' + result + '.' + im.format)
+        return res
         
     else:
         return 'no image attached'

@@ -1,7 +1,18 @@
-导出模型
-python3 export.py --weights runs/train/exp22/weights/last.pt --include torchscript --img 640 --optimize
+导出模型（手机版）
+python3 export.py --weights runs/train/exp18-UI-1031/weights/best.pt --include torchscript --img 640 --optimize
 
+训练模型
 python3 train.py --image-weights
+python3 train.py --img 1280 --rect --epochs 10
+
+TORCH_XNNPACK_DISABLE=1 python detect.py --weights runs/train/exp27-imgsz-640/weights/best.torchscript --source 
+
+启动服务
+
+python3 utils/flask_rest_api/restapi.py
+
+禁止休眠72 小时
+caffeinate -i -m -s -t 72000
 
 <div align="center">
   <p>

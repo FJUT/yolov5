@@ -16,41 +16,50 @@ val: # val images (relative to 'path')  4952 images
 # test: # test images (optional)
 #   - /Users/guotao071/dev/gitlab/white-line/VOCdevkit/images/test
 
-# Classes
-# names: ["white_line"]
-names:
-  0: netless
-  1: weaknet
-  2: strcover
-  3: popup_window
-  4: double_toast
-  5: toast
-  6: player1
-  7: player2
-  8: player3
-  9: ad
-  10: dialog_button
-  11: str_cover_button
-  12: str_back_cover
-  13: str_transparency_button
-  14: status_bar
-  15: button_cover_str
-  16: button_cover
-  17: messy_code
-  18: messy_box
-  19: messy_link
-  20: messy_diamond
-  21: messy_question
-  22: nan
-  23: close_cover
-  24: play_control
-  25: doubleback_cover
-  26: double_logo
-  27: double_dialog
-  28: half_str
-  29: str_suspend
-  30: transparency_button_cover
-  31: escape_character
+# Classes K需配置
+names:  # UI
+  0: white_line
+  1: blank_space
+  2: loss_image
+  3: dialog_prompt
+  4: blank_page
+  5: no_padding
+  6: image_cutoff
+  7: text_suspend
+
+# names: # lighthouse
+#   0: netless
+#   1: weaknet
+#   2: strcover
+#   3: popup_window
+#   4: double_toast
+#   5: toast
+#   6: player1
+#   7: player2
+#   8: player3
+#   9: ad
+#   10: dialog_button
+#   11: str_cover_button
+#   12: str_back_cover
+#   13: str_transparency_button
+#   14: status_bar
+#   15: button_cover_str
+#   16: button_cover
+#   17: messy_code
+#   18: messy_box
+#   19: messy_link
+#   20: messy_diamond
+#   21: messy_question
+#   22: nan
+#   23: close_cover
+#   24: play_control
+#   25: doubleback_cover
+#   26: double_logo
+#   27: double_dialog
+#   28: half_str
+#   29: str_suspend
+#   30: transparency_button_cover
+#   31: escape_character
 
   # 0: white_line
   # 0: aeroplane
